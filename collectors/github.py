@@ -40,7 +40,7 @@ def collect(target_date: date) -> dict:
         elif etype == "PullRequestEvent":
             pr = event["payload"]["pull_request"]
             action = event["payload"]["action"]
-            entry = {"repo": repo, "title": pr["title"], "number": pr["number"]}
+            entry = {"repo": repo, "title": pr.get("title", "(no title)"), "number": pr.get("number")}
             if action == "closed" and pr.get("merged"):
                 prs_merged.append(entry)
             elif action == "opened":
