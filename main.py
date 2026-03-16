@@ -54,7 +54,7 @@ def save_last_run(d: date):
     LAST_RUN_FILE.write_text(json.dumps({"last_date": str(d)}))
 
 
-def run_for_date(target_date: date):
+def run_for_date(target_date: date, team: bool = False):
     logger.info("Collecting data for %s", target_date)
 
     raw_data = {}
@@ -70,6 +70,16 @@ def run_for_date(target_date: date):
     summary = summarizer.summarize(str(target_date), raw_data)
 
     writer.write(target_date, raw_data, summary)
+
+    if team:
+        author = config.AUTHOR_NAME
+        if not author:
+            logger.error("AUTHOR_NAME not set, skipping team daily")
+        elif not config.TEAM_VAULT_PATH:
+            logger.error("TEAM_VAULT_PATH not set, skipping team daily")
+        else:
+            writer.write_team_daily(target_date, raw_data, summary, author)
+
     save_last_run(target_date)
     logger.info("Done: %s", target_date)
 
@@ -79,13 +89,14 @@ def main():
 
     parser = argparse.ArgumentParser(description="DayTrace - Daily activity recorder")
     parser.add_argument("--date", type=date.fromisoformat, help="Specific date (YYYY-MM-DD)")
+    parser.add_argument("--team", action="store_true", help="Also write team daily to shared vault")
     args = parser.parse_args()
 
     dates = get_target_dates(args.date)
     logger.info("Processing %d date(s): %s", len(dates), [str(d) for d in dates])
 
     for d in dates:
-        run_for_date(d)
+        run_for_date(d, team=args.team)
 
 
 if __name__ == "__main__":
