@@ -26,7 +26,6 @@ async def _run_query(full_prompt: str) -> str:
     async for message in query(prompt=full_prompt, options=options):
         if isinstance(message, ResultMessage):
             result_text = message.result
-            break
 
     return result_text
 
