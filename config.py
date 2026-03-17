@@ -11,3 +11,8 @@ SLACK_USER_TOKEN = os.getenv("SLACK_USER_TOKEN", "")
 OBSIDIAN_VAULT_PATH = os.path.expanduser(os.getenv("OBSIDIAN_VAULT_PATH", ""))
 OBSIDIAN_DAYTRACE_DIR = os.getenv("OBSIDIAN_DAYTRACE_DIR", "DayTrace")
 CLAUDE_DIR = os.path.expanduser(os.getenv("CLAUDE_DIR", "~/.claude"))
+
+# Team daily settings
+TEAM_VAULT_PATH = os.path.expanduser(os.getenv("TEAM_VAULT_PATH", ""))
+TEAM_DAYTRACE_DIR = os.getenv("TEAM_DAYTRACE_DIR", "DayTrace-Team")
+AUTHOR_NAME = os.getenv("AUTHOR_NAME", "")

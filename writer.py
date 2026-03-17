@@ -45,3 +45,41 @@ def write(target_date: date, raw_data: dict, summary: str):
 
     filepath.write_text("\n".join(lines), encoding="utf-8")
     logger.info("Written: %s", filepath)
+
+
+def write_team_daily(target_date: date, raw_data: dict, summary: str, author: str):
+    """Write a per-author team daily file to the shared vault."""
+    vault = Path(config.TEAM_VAULT_PATH)
+    if not vault.exists():
+        logger.error("Team vault not found: %s", vault)
+        return
+
+    date_dir = vault / config.TEAM_DAYTRACE_DIR / str(target_date)
+    date_dir.mkdir(parents=True, exist_ok=True)
+    filepath = date_dir / f"{author}.md"
+
+    weekday = WEEKDAYS_KO[target_date.weekday()]
+
+    linear = raw_data.get("linear", {})
+    slack = raw_data.get("slack", {})
+    claude = raw_data.get("claude", {})
+    github = raw_data.get("github", {})
+
+    frontmatter = {
+        "date": str(target_date),
+        "author": author,
+        "tracker": True,
+        "linear_completed": len(linear.get("completed", [])),
+        "github_commits": len(github.get("commits", [])),
+        "slack_messages": slack.get("total", 0),
+        "claude_sessions": claude.get("sessions", 0),
+    }
+
+    lines = ["---"]
+    lines.append(yaml.dump(frontmatter, default_flow_style=False, allow_unicode=True).strip())
+    lines.append("---")
+    lines.append(f"# {target_date} ({weekday})\n")
+    lines.append(summary)
+
+    filepath.write_text("\n".join(lines), encoding="utf-8")
+    logger.info("Written team daily: %s", filepath)
